@@ -6,10 +6,12 @@
 int tickTime = 10; //basically the clock
 int x = 1000; //the time to wait before starting
 int y = 2000; //the time to move forward at the beginning
+int z = 2000; //the time to move backwards when on a line
 
 Motors motors;
 IRSensor ir;
-LineFollower lineFollower;
+LineFollower frontLF;
+LineFollower backLF;
 
 enum State {start, firstForward, stall, reverse, searchLeft, searchRight, forward};
 
@@ -45,7 +47,7 @@ void stateFirstForward() {
     motors.setBothMotors(100);
     if (smartWait(y)) {
         //TODO: add backwards condition
-        if (lineFollower.seeLine()) {
+        if (frontLF.seeLine()) {
             currentState = reverse;
         } else {
             currentState = searchLeft;
@@ -54,11 +56,15 @@ void stateFirstForward() {
 }
 
 void stateStall() {
-
+    //ITS ALL OVER
+    //TODO: Turn magnets on X-/
 }
 
 void stateReverse() {
-
+    motors.setBothMotors(-100);
+    if (smartWait(z)) {
+        currentState = searchLeft;
+    }
 }
 
 void stateSearchLeft() {
