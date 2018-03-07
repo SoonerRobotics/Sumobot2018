@@ -3,10 +3,10 @@
 #include "components/IRSensor.h"
 #include "components/LineFollower.h"
 
-int tickTime = 10; //basically the clock
-int x = 1000; //the time to wait before starting
+int tickTime = 500; //time between ticks in microseconds
+int x = 500; //the time to wait before starting
 int y = 2000; //the time to move forward at the beginning
-int z = 2000; //the time to move backwards when on a line
+int z = 1500; //the time to move backwards when on a line
 
 Motors motors;
 IRSensor ir;
@@ -20,6 +20,7 @@ State currentState = start;
 void setup() {
     motors.init(9, 10);
     ir.init(2);
+    frontLF.init(0);
 }
 
 long startTime = -1;
@@ -29,7 +30,7 @@ boolean smartWait(long timeToWait) {
         startTime = millis();
         waitTime = timeToWait;
     } else {
-        if (millis() - startTime > timeToWait) {
+        if ((long)millis() - startTime > timeToWait) {
             startTime = -1;
             return true;
         }
@@ -37,14 +38,16 @@ boolean smartWait(long timeToWait) {
     return false;
 }
 
+
 void stateStart() {
     if (smartWait(x)) {
-        currentState = firstForward;
+        //currentState = firstForward;
+        currentState = forward;
     }
 }
 
 void stateFirstForward() {
-    motors.setBothMotors(100);
+    motors.setBothMotors(50);
     if (smartWait(y)) {
         //TODO: add backwards condition
         if (frontLF.seeLine()) {
@@ -56,14 +59,17 @@ void stateFirstForward() {
 }
 
 void stateStall() {
-    //ITS ALL OVER
-    //TODO: Turn magnets on X-/
+    motors.setBothMotors(0);
+    if (smartWait(1000)) {
+        currentState = reverse;
+    }
 }
 
 void stateReverse() {
     motors.setBothMotors(-100);
     if (smartWait(z)) {
-        currentState = searchLeft;
+        //currentState = searchLeft;
+        currentState = forward;
     }
 }
 
@@ -76,7 +82,11 @@ void stateSearchRight() {
 }
 
 void stateForward() {
+    motors.setBothMotors(100);
 
+    if  (frontLF.seeLine()) {
+        currentState = stall;
+    }
 }
 
 void loop() {
@@ -92,5 +102,5 @@ void loop() {
         case forward: stateForward(); break;
     }
 
-    delay(tickTime);
+    delayMicroseconds(tickTime);
 }

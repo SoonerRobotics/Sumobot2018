@@ -1,5 +1,6 @@
 #include "motors.h"
 
+
 void Motors::init(int leftMotor, int rightMotor) {
 
   if (setUp) {
@@ -15,6 +16,7 @@ void Motors::init(int leftMotor, int rightMotor) {
   servoRight.write(90);
 }
 
+//TODO: Lerp
 void Motors::setMotorLeft(int speed) {
 
   if (!setUp) {
@@ -33,6 +35,7 @@ void Motors::setMotorLeft(int speed) {
   servoLeft.write(outputSpeed);
 }
 
+//TODO: Lerp
 void Motors::setMotorRight(int speed) {
 
   if (!setUp) {
@@ -53,6 +56,26 @@ void Motors::setMotorRight(int speed) {
 }
 
 void Motors::setBothMotors(int speed) {
-  setMotorLeft(speed);
-  setMotorRight(speed);
+  if (target != speed) { //new setMotorCommand
+    target = speed;
+    startSpeed = curSpeed;
+    curTicks = 1;
+    curSpeed = lerp(startSpeed, speed, curTicks/lerpTime);
+    setMotorLeft(curSpeed);
+    setMotorRight(curSpeed);
+  } else if (curSpeed != speed) {
+    curTicks += curTicks + 1;
+    if (curTicks == lerpTime) {
+      curSpeed = speed;
+    } else {
+      curSpeed = lerp(startSpeed, speed, curTicks/lerpTime);
+    }
+    setMotorLeft(curSpeed);
+    setMotorRight(curSpeed);
+  }
+}
+
+
+int Motors::lerp(int start, int end, double fraction) {
+  return (int)((end - start) * fraction + start);
 }
