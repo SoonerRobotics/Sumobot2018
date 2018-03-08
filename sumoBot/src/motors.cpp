@@ -44,7 +44,7 @@ public:
     servoLeft.write(outputSpeed);
   }
 
-  void setMotorRight(int speed) {
+  void setBothMotors(int speed) {
 
     if (!setUp) {
       return;
@@ -60,7 +60,9 @@ public:
     
     double outputSpeed = 90 + (speed * speedRatio);
 
+    servoLeft.write(outputSpeed);
     servoRight.write(outputSpeed);
   }
+  
   
 };
