@@ -1,7 +1,5 @@
-#ifndef LINEFOLLOWER_H
-#define LINEFOLLOWER_H
-
-#include <Arduino.h>
+#ifndef SUMO_COMPONENTS_LINEFOLLOWER_H_
+#define SUMO_COMPONENTS_LINEFOLLOWER_H_
 
 class LineFollower {
 public:

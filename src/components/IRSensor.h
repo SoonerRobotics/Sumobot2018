@@ -1,7 +1,5 @@
-#ifndef IRSENSOR_H
-#define IRSENSOR_H
-
-#include <Arduino.h>
+#ifndef SUMO_COMPONENTS_IRSENSOR_H_
+#define SUMO_COMPONENTS_IRSENSOR_H_
 
 class IRSensor {
 public:

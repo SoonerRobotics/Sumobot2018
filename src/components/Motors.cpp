@@ -1,5 +1,6 @@
 #include "motors.h"
 
+#include <Arduino.h>
 
 void Motors::init(int leftMotor, int rightMotor) {
 
@@ -18,7 +19,6 @@ void Motors::init(int leftMotor, int rightMotor) {
 
 //TODO: Lerp
 void Motors::setMotorLeft(int speed) {
-
   if (!setUp) {
     return;
   }
@@ -30,9 +30,21 @@ void Motors::setMotorLeft(int speed) {
     speed = -100;
   }
 
-  double outputSpeed = 90 + (speed * speedRatio);
-
-  servoLeft.write(outputSpeed);
+  if (targetL != speed) { //new setMotorCommand
+    targetL = speed;
+    startSpeedL = curSpeedL;
+    curTicksL = 1;
+    curSpeedL = lerp(startSpeedL, speed, ((double)curTicksL)/lerpTime);
+    servoLeft.write(90 + (curSpeedL * speedRatio));
+  } else if (curSpeedL != speed) {
+    curTicksL = curTicksL + 1;
+    if (curTicksL == lerpTime) {
+      curSpeedL = speed;
+    } else {
+      curSpeedL = lerp(startSpeedL, speed, ((double)curTicksL)/lerpTime);
+    }
+    servoLeft.write(90 + (curSpeedL * speedRatio));
+  }
 }
 
 //TODO: Lerp
@@ -49,33 +61,29 @@ void Motors::setMotorRight(int speed) {
     speed = -100;
   }
 
-
-  double outputSpeed = 90 + (speed * speedRatio);
-
-  servoRight.write(outputSpeed);
+  if (targetR != speed) { //new setMotorCommand
+    targetR = speed;
+    startSpeedR = curSpeedR;
+    curTicksR = 1;
+    curSpeedR = lerp(startSpeedR, speed, ((double)curTicksR)/lerpTime);
+    servoRight.write(90 + (curSpeedR * speedRatio));
+  } else if (curSpeedR != speed) {
+    curTicksR = curTicksR + 1;
+    if (curTicksR == lerpTime) {
+      curSpeedR = speed;
+    } else {
+      curSpeedR = lerp(startSpeedR, speed, ((double)curTicksR)/lerpTime);
+    }
+    servoRight.write(90 + (curSpeedR * speedRatio));
+  }
 }
 
 void Motors::setBothMotors(int speed) {
-  if (target != speed) { //new setMotorCommand
-    target = speed;
-    startSpeed = curSpeed;
-    curTicks = 1;
-    curSpeed = lerp(startSpeed, speed, curTicks/lerpTime);
-    setMotorLeft(curSpeed);
-    setMotorRight(curSpeed);
-  } else if (curSpeed != speed) {
-    curTicks += curTicks + 1;
-    if (curTicks == lerpTime) {
-      curSpeed = speed;
-    } else {
-      curSpeed = lerp(startSpeed, speed, curTicks/lerpTime);
-    }
-    setMotorLeft(curSpeed);
-    setMotorRight(curSpeed);
-  }
+  setMotorLeft(speed);
+  setMotorRight(speed);
 }
 
 
 int Motors::lerp(int start, int end, double fraction) {
-  return (int)((end - start) * fraction + start);
+  return (int)(start + (end - start) * fraction);
 }

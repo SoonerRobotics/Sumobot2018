@@ -1,5 +1,7 @@
 #include "IRSensor.h"
 
+#include <Arduino.h>
+
 void IRSensor::init(int _pin) {
 
   if (setUp) {
