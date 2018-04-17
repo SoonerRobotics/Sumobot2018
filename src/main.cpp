@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "components/Motors.h"
 #include "components/IRSensor.h"
 #include "components/LineFollower.h"
@@ -12,7 +13,7 @@ IRSensor leftSensor;
 IRSensor rightSensor;
 LineFollower fline0;
 LineFollower fline1;
-//           0        1      2      3         4            5           6
+
 enum State {start, center, stall, search, reverse, chase, forward};
 
 State currentState = start;
