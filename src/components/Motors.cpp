@@ -17,7 +17,11 @@ void Motors::init(int leftMotor, int rightMotor) {
   servoRight.write(90);
 }
 
-//TODO: Lerp
+void Motors::update() {
+  setMotorRight(targetR);
+  setMotorLeft(targetL);
+}
+
 void Motors::setMotorLeft(int speed) {
   if (!setUp) {
     return;
@@ -47,7 +51,6 @@ void Motors::setMotorLeft(int speed) {
   }
 }
 
-//TODO: Lerp
 void Motors::setMotorRight(int speed) {
 
   if (!setUp) {

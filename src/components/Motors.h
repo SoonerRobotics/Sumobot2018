@@ -7,10 +7,11 @@ class Motors {
 public:
 
   double const speedRatio = 90.0/100.0;
-  int const lerpTime = 8; //ticks
+  int const lerpTime = 12; //ticks
 
   void init(int leftMotor, int rightMotor);
 
+  void update();
   void setMotorLeft(int speed);
   void setMotorRight(int speed);
   void setBothMotors(int speed);

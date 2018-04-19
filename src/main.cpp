@@ -3,11 +3,11 @@
 #include "components/IRSensor.h"
 #include "components/LineFollower.h"
 
-#define startDelay 500 //Milliseconds to wait before starting
-#define reverseTime 500 //Milliseconds to move backwards when robo detects a line
-#define centerTime 500 //Milliseconds to run to the center at the start of the match
+int startDelay = 500; //Milliseconds to wait before starting
+int reverseTime = 500; //Milliseconds to move backwards when robo detects a line
+int centerTime = 500; //Milliseconds to run to the center at the start of the match
 
-#define detectRange 30 //Distance to detect robots at with IR
+int detectRange = 30; //Distance to detect robots at with IR
 
 Motors motors;
 IRSensor leftSensor;
@@ -58,29 +58,32 @@ void stateStall() {
     motors.setBothMotors(0);
 }
 
-bool primeSearch = true;
+bool lastLookingRight = true;
 void stateSearch() {
 
-    if(primeSearch){
-        motors.setMotorLeft(25);
-        motors.setMotorRight(-25);
-        primeSearch = false;
-    }
-
-    bool detectL = rightSensor.getDistance() < detectRange;
-    bool detectR = leftSensor.getDistance() < detectRange;
+    bool detectL = leftSensor.getDistance() < detectRange;
+    bool detectR = rightSensor.getDistance() < detectRange;
 
     if (detectR && detectL) { // detect in front
-        primeSearch = true;
         currentState = chase;
     }
     else if (detectR && !detectL) { // detect right sensor
-        motors.setMotorRight(30);
-        motors.setMotorLeft(-30);
-    }
-    else if (!detectR && detectL) { // detect left sensor
+        lastLookingRight = true;
         motors.setMotorRight(-30);
         motors.setMotorLeft(30);
+    }
+    else if (!detectR && detectL) { // detect left sensor
+        lastLookingRight = false;
+        motors.setMotorRight(30);
+        motors.setMotorLeft(-30);
+    } else {
+        if (lastLookingRight) {
+            motors.setMotorRight(-30);
+            motors.setMotorLeft(30);
+        } else {
+            motors.setMotorRight(30);
+            motors.setMotorLeft(-30);
+        }
     }
 }
 void stateChase(){
@@ -96,12 +99,12 @@ void stateChase(){
 
 void stateCenter(){
     motors.setBothMotors(75);
+    if  (fline0.seeLine() || fline1.seeLine()) {
+        currentState = reverse;
+        return;
+    }
     if (smartWait(centerTime)) {
         motors.setBothMotors(0);
-        if  (fline0.seeLine() || fline1.seeLine()) {
-            currentState = reverse;
-            return;
-        }
         if ((rightSensor.getDistance() < detectRange) && (leftSensor.getDistance() < detectRange)) { // detect in front
             currentState = chase;
         }
@@ -127,6 +130,8 @@ void stateReverse() {
 void loop() {
     leftSensor.update();
     rightSensor.update();
+
+    motors.update();
 
     switch (currentState) {
         case start: stateStart(); break;
