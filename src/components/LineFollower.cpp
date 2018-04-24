@@ -10,9 +10,6 @@ void LineFollower::init(int _pin) {
 }
 
 bool LineFollower::seeLine() {
-
-    if (analogRead(pin) >= 800) {
-        return false;
-    }
-    return true;
+    
+    return analogRead(pin) <= 200;
 }
