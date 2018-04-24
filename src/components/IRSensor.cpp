@@ -12,7 +12,7 @@ void IRSensor::init(int _pin) {
 
   pin = _pin;
   
-  pinMode(pin, OUTPUT);
+  pinMode(pin, INPUT);
 }
 
 void IRSensor::update() {

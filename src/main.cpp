@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "components/Motors.h"
+#include "components/Magnets.h"
 #include "components/IRSensor.h"
 #include "components/LineFollower.h"
 
@@ -15,6 +16,8 @@ IRSensor rightSensor;
 LineFollower fline0; //front line follower 0
 LineFollower fline1; //front line follower 1
 
+Magnets magnets;
+
 enum State {start, center, stall, search, reverse, chase, forward};
 State currentState = start;
 
@@ -26,6 +29,8 @@ void setup() {
 
     fline0.init(0);
     fline1.init(1);
+
+    magnets.init(2);
 
     Serial.begin(9600); //TODO: delete for tournament final
 }
@@ -56,10 +61,16 @@ void stateStart() {
 
 void stateStall() {
     motors.setBothMotors(0);
+    magnets.setState(true);
 }
 
 bool lastLookingRight = true;
 void stateSearch() {
+
+    if (fline0.seeLine() || fline1.seeLine()) {
+        currentState = stall;
+        return;
+    }
 
     bool detectL = leftSensor.getDistance() < detectRange;
     bool detectR = rightSensor.getDistance() < detectRange;
