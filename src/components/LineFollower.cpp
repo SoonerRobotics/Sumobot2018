@@ -1,5 +1,4 @@
 #include "LineFollower.h"
-
 #include <Arduino.h>
 
 void LineFollower::init(int _pin) {
@@ -9,7 +8,14 @@ void LineFollower::init(int _pin) {
     pinMode(pin, INPUT);
 }
 
+void LineFollower::init(int _pin, int _sensitivity) {
+    pin = _pin;
+    sensitivity = _sensitivity;
+    setUp = true;
+
+    pinMode(pin, INPUT);
+}
+
 bool LineFollower::seeLine() {
-    
-    return analogRead(pin) <= 200;
+    return analogRead(pin) <= sensitivity;
 }

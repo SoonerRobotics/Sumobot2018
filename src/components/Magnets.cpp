@@ -10,7 +10,6 @@ void Magnets::init(int _pin) {
 }
 
 void Magnets::setState(bool on) {
-
     digitalWrite(pin, on);
     isOn = on;
 }

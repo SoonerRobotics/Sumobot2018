@@ -24,9 +24,10 @@ void IRSensor::update() {
 }
 
 double IRSensor::getDistanceNow() {
-  float volts = analogRead(pin)*0.0048828125;  // value from sensor * (5/1024)
-  double distance =  42*pow(volts, -1); // worked out from datasheet graph
-  return distance;
+  // Transform the analog input into a scale of 0.0 - 5.0 V
+  // By multiplying by (5.0/1024.0)
+  float volts = analogRead(pin) * 0.0048828125;
+  return 42*pow(volts, -1); // worked out from datasheet graph
 }
 
 double IRSensor::getDistance() {
